@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cskt.mapper.HotelOrderMapper">
+  <resultMap id="BaseResultMap" type="com.cskt.entity.HotelOrder">
+    <!--@mbg.generated-->
+    <!--@Table itrip_hotel_order-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="order_type" jdbcType="INTEGER" property="orderType" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
+    <result column="hotel_id" jdbcType="BIGINT" property="hotelId" />
+    <result column="hotel_name" jdbcType="VARCHAR" property="hotelName" />
+    <result column="room_id" jdbcType="BIGINT" property="roomId" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="booking_days" jdbcType="INTEGER" property="bookingDays" />
+    <result column="check_in_date" jdbcType="TIMESTAMP" property="checkInDate" />
+    <result column="check_out_date" jdbcType="TIMESTAMP" property="checkOutDate" />
+    <result column="order_status" jdbcType="INTEGER" property="orderStatus" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="pay_type" jdbcType="INTEGER" property="payType" />
+    <result column="notice_phone" jdbcType="VARCHAR" property="noticePhone" />
+    <result column="notice_email" jdbcType="VARCHAR" property="noticeEmail" />
+    <result column="special_requirement" jdbcType="LONGVARCHAR" property="specialRequirement" />
+    <result column="is_need_invoice" jdbcType="INTEGER" property="isNeedInvoice" />
+    <result column="invoice_type" jdbcType="INTEGER" property="invoiceType" />
+    <result column="invoice_head" jdbcType="VARCHAR" property="invoiceHead" />
+    <result column="link_user_name" jdbcType="VARCHAR" property="linkUserName" />
+    <result column="book_type" jdbcType="INTEGER" property="bookType" />
+    <result column="creation_date" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="created_by" jdbcType="BIGINT" property="createdBy" />
+    <result column="modify_date" jdbcType="TIMESTAMP" property="modifyDate" />
+    <result column="modified_by" jdbcType="BIGINT" property="modifiedBy" />
+    <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, user_id, order_type, order_no, trade_no, hotel_id, hotel_name, room_id, `count`,
+    booking_days, check_in_date, check_out_date, order_status, pay_amount, pay_type,
+    notice_phone, notice_email, special_requirement, is_need_invoice, invoice_type, invoice_head,
+    link_user_name, book_type, creation_date, created_by, modify_date, modified_by, is_deleted
+  </sql>
+<select id="preFlushStore" statementType="CALLABLE"
+  parameterType="com.cskt.vo.ValidateRoomStoreCondition">
+    {
+        call pre_flush_store(
+             #{checkInDate,mode=IN},
+             #{checkOutDate,mode=IN},
+             #{roomId,mode=IN},
+             #{hotelId,mode=IN}
+        )
+    }
+  </select>
+
+<select id="searchTempStore" statementType="CALLABLE" resultType="int" parameterType="com.cskt.vo.ValidateRoomStoreCondition">
+  {
+      call search_temp_store(
+          #{hotelId,mode=IN},
+          #{checkInDate,mode=IN},
+          #{checkOutDate,mode=IN},
+          #{store,mode=OUT,jdbcType=INTEGER}
+          )
+  }
+</select>
+
+<select id="searchUnPayStore" statementType="CALLABLE" resultType="int" parameterType="com.cskt.vo.ValidateRoomStoreCondition">
+  {
+      call search_unpay_store(
+          #{hotelId,mode=IN},
+          #{roomId,mode=IN},
+     	  #{checkInDate,mode=IN},
+          #{checkOutDate,mode=IN},
+          #{store,jdbcType=INTEGER,mode=OUT}
+      )
+  }
+</select>
+
+<select id="selectPersonalOrderRoomVOByOrderId" parameterType="long" resultType="com.cskt.vo.PersonalOrderRoomVO">
+select itrip_hotel_order.id,
+           itrip_hotel_order.hotel_id,
+           itrip_hotel_order.hotel_name,
+           itrip_hotel.hotel_level,
+           itrip_hotel.address,
+           itrip_hotel_order.room_id,
+           itrip_hotel_room.room_title,
+           itrip_hotel_room.room_bed_type_id,
+           itrip_hotel_order.check_in_date,
+           itrip_hotel_order.check_out_date,
+           itrip_hotel_order.count,
+           itrip_hotel_order.booking_days,
+           itrip_hotel_order.link_user_name,
+           itrip_hotel_order.special_requirement,
+           itrip_hotel_order.pay_amount,
+           itrip_hotel_room.pay_type                  as room_pay_type,
+           itrip_hotel_room.is_having_breakfast,
+           itrip_label_dic.name                       as room_bed_type_name,
+           dayofweek(itrip_hotel_order.check_in_date) as check_in_week,
+           dayofweek(itrip_hotel_order.check_out_date)   check_out_week
+    from itrip_hotel_order
+             left join itrip_hotel on itrip_hotel.id = itrip_hotel_order.hotel_id
+             left join itrip_hotel_room on itrip_hotel_room.id = itrip_hotel_order.room_id
+             left join itrip_label_dic on itrip_label_dic.id = itrip_hotel_room.room_bed_type_id
+    where itrip_hotel_order.id = #{orderId,jdbcType=BIGINT}
+</select>
+<select id="selectOrderVOListByCondition" parameterType="com.cskt.vo.SearchOrderCondition"
+        resultType="com.cskt.vo.ListHotelOrderVO">
+    select
+    itrip_hotel_order.id,
+    itrip_hotel_order.hotel_id,
+    itrip_hotel_order.hotel_name,
+    itrip_hotel_order.order_no,
+    itrip_hotel_order.order_type,
+    itrip_hotel_order.link_user_name,
+    itrip_hotel_order.creation_date,
+    itrip_hotel_order.check_in_date,
+    itrip_hotel_order.pay_amount,
+    itrip_hotel_order.order_status
+    from itrip_hotel_order
+    where itrip_hotel_order.user_id = #{userId}
+    <if test="orderNo != null and orderNo != ''">
+        and itrip_hotel_order.order_no = #{orderNo,jdbcType=VARCHAR}
+    </if>
+    <if test="linkUserName != null and linkUserName != ''">
+        and itrip_hotel_order.link_user_name like concat('%',#{linkUserName,jdbcType=VARCHAR},'%')
+    </if>
+    <if test="startDate != null">
+        and creation_date <![CDATA[>=]]> #{startDate,jdbcType=DATE}
+    </if>
+    <if test="endDate != null">
+        and creation_date  <![CDATA[<=]]> #{endDate,jdbcType=DATE}
+    </if>
+    <if test="orderStatus > -1">
+        and order_status = #{orderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="orderType > -1">
+        and order_type = #{orderType,jdbcType=INTEGER}
+    </if>
+    order by creation_date desc
+    limit #{beginPos,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+
+</select>
+<select id="selectOrderVOCountByCondition" parameterType="com.cskt.vo.SearchOrderCondition"
+        resultType="java.lang.Integer">
+    select count(total.id)
+    from (
+        select
+            itrip_hotel_order.id,
+            itrip_hotel_order.hotel_id,
+            itrip_hotel_order.hotel_name,
+            itrip_hotel_order.order_no,
+            itrip_hotel_order.order_type,
+            itrip_hotel_order.link_user_name,
+            itrip_hotel_order.creation_date,
+            itrip_hotel_order.check_in_date,
+            itrip_hotel_order.pay_amount,
+            itrip_hotel_order.order_status
+        from itrip_hotel_order
+        where itrip_hotel_order.user_id = #{userId}
+        <if test="orderNo != null and orderNo != ''">
+            and itrip_hotel_order.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test="linkUserName != null and linkUserName != ''">
+            and itrip_hotel_order.link_user_name like concat('%',#{linkUserName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="startDate != null">
+            and creation_date <![CDATA[>=]]> #{startDate,jdbcType=DATE}
+        </if>
+        <if test="endDate != null">
+            and creation_date  <![CDATA[<=]]> #{endDate,jdbcType=DATE}
+        </if>
+        <if test="orderStatus > -1">
+            and order_status = #{orderStatus,jdbcType=INTEGER}
+        </if>
+        <if test="orderType > -1">
+            and order_type = #{orderType,jdbcType=INTEGER}
+        </if>
+        order by creation_date desc
+    ) as total
+
+</select>
+</mapper>
