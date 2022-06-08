@@ -15,10 +15,19 @@
         <maven.compiler.target>8</maven.compiler.target>
         <itrip.version>0.0.1-SNAPSHOT</itrip.version>
     </properties>
+
     <dependencies>
+        <!--    不需要写版本，父模块已经定义好了-->
+        <!--itrip-beans-->
         <dependency>
             <groupId>com.cskt</groupId>
             <artifactId>itrip-beans</artifactId>
+            <version>${itrip.version}</version>
+        </dependency>
+        <!--itrip-dao-->
+        <dependency>
+            <groupId>com.cskt</groupId>
+            <artifactId>itrip-dao</artifactId>
             <version>${itrip.version}</version>
         </dependency>
     </dependencies>

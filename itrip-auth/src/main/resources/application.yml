@@ -1,0 +1,48 @@
+#日志
+logging:
+    level:
+        root: WARN
+#端口号
+server:
+    port: 8801
+    servlet:   #指定servlet上下文路径
+        context-path: /auth
+spring:
+    #数据库配置
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:myswl://localhost:3306/dump-itripdb
+        password: root
+        username: root
+    #返回json的全局时间格式
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: GMT+8
+    #配置邮箱发送基本信息
+    mail:
+        default-encoding: UTF-8
+        host: smtp.qq.com
+        username: 3193811573@qq.com
+        password: 20041219pjj
+        protocol: smtp
+        smtp.auth: true
+        smtp.port: 994
+        smtp.ssl.enable: true
+
+
+#mybatis-plus 配置
+mybatis-plus:
+    mapper-locations: classpath:com/cskt/mapper/xml/*.xml
+    configuration:
+        map-underscore-to-camel-case: true
+        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl #日志
+    type-aliases-package: com.cskt.entity
+    #逻辑删除
+    global-config:
+        db-config:
+        # 全局逻辑删除的实体字段名
+         logic-delete-field: isDeleted
+        # 逻辑已删除值
+         logic-delete-value: 1
+        # 逻辑未删除值
+         logic-not-delete-value: 0
